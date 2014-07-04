@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Speech;
 using System.Speech.Synthesis;
 using System.Speech.Recognition;
 using System.Threading;
@@ -19,78 +20,96 @@ namespace HueVoice
 {
     public partial class Form1 : Form
     {
-        private IHueClient _client;
-
+        private WebClient client;
+        SpeechSynthesizer sSynth = new SpeechSynthesizer();
+        PromptBuilder pBuilder = new PromptBuilder();
+        SpeechRecognitionEngine sRecognize = new SpeechRecognitionEngine();
+        SpeechRecognitionEngine sRecognize2 = new SpeechRecognitionEngine();
 
         public Form1()
         {
+            
             InitializeComponent();
+            client = new WebClient();
+            client.UploadStringCompleted += new UploadStringCompletedEventHandler(UploadStringCallback2);
+            sRecognize2.SpeechRecognized += sRecognize_SpeechRecognized2;
+            sRecognize.SpeechRecognized += sRecognize_SpeechRecognized;
+            sRecognize.SetInputToDefaultAudioDevice();
+            sRecognize2.SetInputToDefaultAudioDevice();
+
+
             
         }
 
 
+        public void hueListen()
+        {
+            if (!client.IsBusy)
+            {
+                var uri = new Uri(string.Format("http://{0}/api/homepagewebsite/groups/0/action", "192.168.1.53"));
+
+                var reg = new
+                {
+                    hue = 50000
+                };
+
+                var jsonObj = JsonConvert.SerializeObject(reg);
+
+                client.UploadStringAsync(uri, "PUT", jsonObj);
+                textBox1.AppendText(System.Environment.NewLine + "Listening...");
+            }
+            
+        }
+
         public void turnOffLights()
         {
-          string ip = "http://192.168.1.53";
-          string key = "homepagewebsite";
 
-          _client = new HueClient(ip, key);
-          var client = new WebClient();
-          var uri = new Uri(string.Format("http://{0}/api/homepagewebsite/groups/0/action", "192.168.1.53"));
-
-          var reg = new
+          if (!client.IsBusy)
           {
-              on =  false
-          };
+              var uri = new Uri(string.Format("http://{0}/api/homepagewebsite/groups/0/action", "192.168.1.53"));
 
+              var reg = new
+              {
+                  on =  false
+              };
 
+              var jsonObj = JsonConvert.SerializeObject(reg);
 
+              client.UploadStringAsync(uri, "PUT", jsonObj);
+              textBox1.AppendText(System.Environment.NewLine + "lights are off");
+              
+          }
 
-          var jsonObj = JsonConvert.SerializeObject(reg);
-
-          client.UploadStringAsync(uri, "PUT", jsonObj);
-          client.UploadStringCompleted
-               += new UploadStringCompletedEventHandler(UploadStringCallback2);
-
-          
-
+         
         }
 
         public void turnOnLights()
         {
-            string ip = "http://192.168.1.53";
-            string key = "homepagewebsite";
 
-            _client = new HueClient(ip, key);
-            var client = new WebClient();
-            var uri = new Uri(string.Format("http://{0}/api/homepagewebsite/groups/0/action", "192.168.1.53"));
-
-            var reg = new
+            if (!client.IsBusy)
             {
-                on = true
-            };
+                client = new WebClient();
+                var uri = new Uri(string.Format("http://{0}/api/homepagewebsite/groups/0/action", "192.168.1.53"));
 
+                var reg = new
+                {
+                    on = true
+                };
 
+                var jsonObj = JsonConvert.SerializeObject(reg);
 
-
-            var jsonObj = JsonConvert.SerializeObject(reg);
-
-            client.UploadStringAsync(uri, "PUT", jsonObj);
-            client.UploadStringCompleted
-                 += new UploadStringCompletedEventHandler(UploadStringCallback2);
-
-
+                client.UploadStringAsync(uri, "PUT", jsonObj);
+                textBox1.AppendText(System.Environment.NewLine + "lights are on");
+            }
 
         }
 
 
-        SpeechSynthesizer sSynth = new SpeechSynthesizer();
-        PromptBuilder pBuilder = new PromptBuilder();
-        SpeechRecognitionEngine sRecognize = new SpeechRecognitionEngine();
+
 
         void UploadStringCallback2(object sender, UploadStringCompletedEventArgs e)
         {
-            textBox1.Text = e.Result;
+            //textBox1.AppendText(e.Result);
         }
 
 
@@ -103,20 +122,31 @@ namespace HueVoice
 
         private void button2_Click(object sender, EventArgs e)
         {
+
+
+            DictationGrammar defaultDictationGrammar = new DictationGrammar();
+            defaultDictationGrammar.Name = "default dictation";
+            defaultDictationGrammar.Enabled = true;
+
+
+
             button2.Enabled = false;
             button3.Enabled = true;
             Choices sList = new Choices();
-            sList.Add(new string[] { "lights off", "lights on", "it works", "how", "are", "you", "today", "i", "am", "fine", "exit", "close", "quit", "so" });
+            sList.Add(new string[] { "ok room" });
             Grammar gr = new Grammar(new GrammarBuilder(sList));
             try
             {
+               
                 sRecognize.RequestRecognizerUpdate();
                 sRecognize.LoadGrammar(gr);
+                sRecognize.LoadGrammar(defaultDictationGrammar);
                 sRecognize.SpeechRecognized += sRecognize_SpeechRecognized;
-                sRecognize.SetInputToDefaultAudioDevice();
+                
+                textBox1.Text = sRecognize.AudioLevel.ToString();
+                sRecognize.AudioLevelUpdated += sRecognize2_AudioLevelUpdated;
                 sRecognize.RecognizeAsync(RecognizeMode.Multiple);
                 sRecognize.Recognize();
-
 
             }
 
@@ -124,9 +154,69 @@ namespace HueVoice
             {
                 return;
             }
+
+
+
+
         }
 
         private void sRecognize_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
+        {
+            DictationGrammar defaultDictationGrammar = new DictationGrammar();
+            defaultDictationGrammar.Name = "default dictation";
+            defaultDictationGrammar.Enabled = true;
+
+
+            if (e.Result.Confidence > 0.6)
+            {
+
+                textBox1.Text = e.Result.Text.ToString();
+                string command = e.Result.Text.ToString().ToLower();
+                if (e.Result.Text == "exit")
+                {
+                    Application.Exit();
+                }
+                else if (command == "ok room" || command == "okay room")
+                {
+
+                    hueListen();
+                    Choices sList = new Choices();
+                    sList.Add(new string[] { "lights off", "lights on", "what's the current weather" });
+                    Grammar gr = new Grammar(new GrammarBuilder(sList));
+                    try
+                    {
+
+                        sRecognize2.RequestRecognizerUpdate();
+                        sRecognize2.LoadGrammar(gr);
+                        sRecognize2.LoadGrammar(defaultDictationGrammar);
+                        sRecognize2.RecognizeAsync(RecognizeMode.Multiple);
+                        sRecognize2.Recognize();
+                        sRecognize2.AudioLevelUpdated += sRecognize2_AudioLevelUpdated;
+
+                    }
+
+                    catch
+                    {
+                        return;
+                    }
+
+                }
+            }
+            else
+            {
+                textBox1.Text = "what? " + e.Result.Text.ToString();
+            }
+
+        }
+
+        void sRecognize2_AudioLevelUpdated(object sender, AudioLevelUpdatedEventArgs e)
+        {
+            
+            verticalVolumeBar.Value = e.AudioLevel;
+           
+        }
+
+        private void sRecognize_SpeechRecognized2(object sender, SpeechRecognizedEventArgs e)
         {
             if (e.Result.Text == "exit")
             {
@@ -134,21 +224,28 @@ namespace HueVoice
             }
             else
             {
-                
-                if (e.Result.Text.ToString() == "lights off")
+                if (e.Result.Confidence > 0.6)
                 {
-                    turnOffLights();
+                    if (e.Result.Text.ToString() == "lights off")
+                    {
+                        turnOffLights();
+                    }
+
+                    else if (e.Result.Text.ToString() == "lights on")
+                    {
+                        turnOnLights();
+                    }
+                    else
+                    {
+                        textBox1.AppendText(e.Result.Text.ToString());
+                    }
+                    //Stop listening for commands
+                    sRecognize2.RecognizeAsyncStop();
                 }
 
-                if (e.Result.Text.ToString() == "lights on")
-                {
-                    turnOnLights();
-                }
-                
             }
 
         }
-
 
         private void button3_Click(object sender, EventArgs e)
         {
@@ -157,19 +254,7 @@ namespace HueVoice
             button3.Enabled = false;
         }
 
-        public async Task SendCommandAsync()
-        {
-            //Create command
-            var command = new LightCommand();
-            command.TurnOn();
-            command.SetColor("#225566");
+        
 
-            List<string> lights = new List<string>();
-
-            //Send Command
-            await _client.SendCommandAsync(command);
-            await _client.SendCommandAsync(command, lights);
-
-        }
     }
 }
