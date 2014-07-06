@@ -12,6 +12,8 @@ namespace HueVoice
         int brightness;
         int hue;
         int saturation;
+        double xColorCord;
+        double yColorCord;
         string alert;
         string effect;
         string colormode;
@@ -23,6 +25,8 @@ namespace HueVoice
             brightness = data["state"].bri;
             hue = data["state"].hue;
             saturation = data["state"].sat;
+            xColorCord = data["state"].xy[0];
+            yColorCord = data["state"].xy[1];
             alert = data["state"].alert;
             effect = data["state"].effect;
             colormode = data["state"].colormode;
@@ -30,5 +34,5 @@ namespace HueVoice
         }
     }
 
-    
+
 }

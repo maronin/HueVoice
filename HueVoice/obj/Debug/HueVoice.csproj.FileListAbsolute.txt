@@ -36,5 +36,5 @@ C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\bin\Debug\System.Net.Http.Primi
 C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\obj\Debug\HueVoice.csproj.App.config
 C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\obj\Debug\HueVoice.Properties.Resources.resources
 C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\obj\Debug\HueVoice.csproj.GenerateResource.Cache
-C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\obj\Debug\HueVoice.csprojResolveAssemblyReference.cache
 C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\obj\Debug\HueVoice.HueForm.resources
+C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\obj\Debug\HueVoice.csprojResolveAssemblyReference.cache
