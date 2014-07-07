@@ -15,12 +15,14 @@ namespace HueVoice
     {
         string bridgeIP, username;
         WebClient client;
+        HueForm _form;
 
-        public HueBridge(string ip, string username)
+        public HueBridge(string ip, string username, HueForm frm)
         {
             bridgeIP = ip;
             this.username = username;
             client = new WebClient();
+            _form = frm;
         }
 
         public void getLight(int lightNum)
@@ -70,7 +72,7 @@ namespace HueVoice
             PUT("http://" + bridgeIP + "/api/" + username + "/groups/" + group + "/action", data);
         }
 
-        public void dimLights(string p, string group)
+        public void setBrightness(string p, string group)
         {
             double percentage = double.Parse(p.TrimEnd(new[] { '%' })) / 100;
             //dynamic lightData = GET("http://" + bridgeIP + "/api/" + username + "/groups/" + group);
@@ -122,7 +124,8 @@ namespace HueVoice
 
         void UploadStringCallback(object sender, UploadStringCompletedEventArgs e)
         {
-            //MessageBox.Show(e.Result + System.Environment.NewLine);
+            _form.setConsoleText(e.Result);
+           
 
         }
 
@@ -189,5 +192,13 @@ namespace HueVoice
             return xyAsList;
         }
 
+
+        public void changeSaturation(int sat, string group)
+        {
+            client = new WebClient();
+
+            string data = "{\"sat\":" + sat + "}";
+            PUT("http://" + bridgeIP + "/api/" + username + "/groups/" + group + "/action", data);
+        }
     }
 }

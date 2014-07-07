@@ -19,30 +19,27 @@ namespace HueVoice
 {
     public partial class HueForm : Form
     {
-        private WebClient client;
+
         SpeechSynthesizer sSynth = new SpeechSynthesizer();
         PromptBuilder pBuilder = new PromptBuilder();
-        SpeechRecognitionEngine recognizeHotWord = new SpeechRecognitionEngine();
         SpeechRecognitionEngine recognizeCommands = new SpeechRecognitionEngine();
-        HueBridge hueBridge = new HueBridge("192.168.1.53", "homepagewebsite");
+        HueBridge hueBridge;
+
+
         public HueForm()
         {
 
-
+            hueBridge = new HueBridge("192.168.1.53", "homepagewebsite", this);
             InitializeComponent();
-            client = new WebClient();
 
 
 
             List<HueLight> lights = hueBridge.getAllLights();
+            trackBarSaturation.MouseUp += trackBarSaturation_MouseUp;
 
-            client.Proxy = null;
-
-            client.UploadStringCompleted += new UploadStringCompletedEventHandler(UploadStringCallback2);
 
 
             initializeRecognizeCommands();
-            initializeRecognizeHotWord();         
 
             sSynth.SelectVoice("VW Julie");
             sSynth.Volume = 100;
@@ -97,39 +94,6 @@ namespace HueVoice
         }
 
 
-        public void initializeRecognizeHotWord()
-        {
-            DictationGrammar defaultDictationGrammar = new DictationGrammar();
-            defaultDictationGrammar.Name = "default dictation";
-            defaultDictationGrammar.Enabled = true;
-
-            recognizeHotWord.SpeechRecognized += recognizeHotWord_SpeechRecognized;
-            recognizeHotWord.SetInputToDefaultAudioDevice();
-            recognizeHotWord.SpeechDetected += recognizeHotWord_SpeechDetected;
-            recognizeHotWord.AudioLevelUpdated += AudioLevelUpdated;
-            
-
-            Choices sList = new Choices();
-            sList.Add(new string[] 
-                { 
-                    "roomy"
-                });
-            Grammar gr = new Grammar(new GrammarBuilder(sList));
-            try
-            {
-
-                recognizeHotWord.RequestRecognizerUpdate();
-                recognizeHotWord.LoadGrammar(gr);
-                //recognizeHotWord.LoadGrammar(defaultDictationGrammar);
-                
-
-            }
-
-            catch
-            {
-                return;
-            }
-        }
 
         public void initializeRecognizeCommands()
         {
@@ -139,28 +103,28 @@ namespace HueVoice
 
             recognizeCommands.SpeechRecognized += recognizeCommands_SpeechRecognized;
             recognizeCommands.SetInputToDefaultAudioDevice();
-            recognizeCommands.SpeechDetected += recognizeHotWord_SpeechDetected;
+            recognizeCommands.SpeechDetected += recognizeCommands_SpeechDetected;
             recognizeCommands.AudioLevelUpdated += AudioLevelUpdated;
 
             Choices sList = new Choices();
 
             for (int i = 1; i <= 100; i++)
             {
-                sList.Add("lights " + i + "%");
+                sList.Add("roomy lights " + i + "%");
             }
 
 
             sList.Add(new string[] 
                 { 
-                    "lights off", 
-                    "lights on", 
-                    "red lights", 
-                    "green lights",                   
-                    "blue lights",
-                    "white lights", 
-                    "orange lights",
-                    "yellow lights",
-                    "purple lights"
+                    "roomy lights off", 
+                    "roomy lights on", 
+                    "roomy red lights", 
+                    "roomy green lights",                   
+                    "roomy blue lights",
+                    "roomy white lights", 
+                    "roomy orange lights",
+                    "roomy yellow lights",
+                    "roomy purple lights"
                 });
             Grammar gr = new Grammar(new GrammarBuilder(sList));
             try
@@ -168,11 +132,8 @@ namespace HueVoice
 
                 recognizeCommands.RequestRecognizerUpdate();
                 recognizeCommands.LoadGrammar(gr);
-               // recognizeCommands.LoadGrammar(defaultDictationGrammar);
+                recognizeCommands.LoadGrammar(defaultDictationGrammar);
 
-                //recognizeCommands.RecognizeAsync(RecognizeMode.Multiple);
-                //recognizeCommands.Recognize();
-                
             }
 
             catch
@@ -181,126 +142,41 @@ namespace HueVoice
             }
         }
 
-        void recognizeHotWord_SpeechDetected(object sender, SpeechDetectedEventArgs e)
+        void recognizeCommands_SpeechDetected(object sender, SpeechDetectedEventArgs e)
         {
-            textBox2.BackColor = Color.Red;
-        }
-
-
-        public void hueListen()
-        {
-            if (!client.IsBusy)
-            {
-                var GetUri = new Uri(string.Format("http://{0}/api/homepagewebsite/groups/0", "192.168.1.53"));
-
-
-                var jsonThing = client.DownloadString(GetUri); //how to GET from a URL
-                dynamic data = JsonConvert.DeserializeObject(jsonThing);
-                Console.WriteLine(data["action"].on);
-
-                var putUri = new Uri(string.Format("http://{0}/api/homepagewebsite/groups/0/action", "192.168.1.53"));
-                var reg = new
-                {
-                    hue = 25718
-                };
-
-                var jsonObj = JsonConvert.SerializeObject(reg);
-
-                if (!client.IsBusy)
-                {
-                    client.UploadStringAsync(putUri, "PUT", jsonObj);
-                    textBox1.AppendText("Listening..." + System.Environment.NewLine);
-                    sSynth.SpeakAsync("listening...");
-
-
-                }
-            }
-
-        }
-
-        void UploadStringCallback2(object sender, UploadStringCompletedEventArgs e)
-        {
-            //textBox1.AppendText(e.Result + System.Environment.NewLine);
-        }
-
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            pBuilder.ClearContent();
-            pBuilder.AppendText(textBox1.Text);
-            sSynth.Speak(pBuilder);
+            micListeningBox.BackColor = Color.Red;
         }
 
         private void btnHueListen_Click(object sender, EventArgs e)
         {
             btnHueListen.Enabled = false;
             button3.Enabled = true;
-            
-            recognizeHotWord.RecognizeAsync(RecognizeMode.Multiple);
-            
+            recognizeCommands.RecognizeAsync(RecognizeMode.Multiple);
 
         }
 
-        private void recognizeHotWord_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
+        public void setConsoleText(string text)
         {
-            DictationGrammar defaultDictationGrammar = new DictationGrammar();
-            defaultDictationGrammar.Name = "default dictation";
-            defaultDictationGrammar.Enabled = true;
-
-            string command = e.Result.Text.ToString().ToLower();
-            if (e.Result.Confidence > 0.6)
+            if (text.Contains("success"))
             {
-
-
-                if (e.Result.Text == "exit")
-                {
-                    Application.Exit();
-                }
-
-                else if (command == "roomy")
-                {
-                    try
-                    {
-                        recognizeHotWord.RecognizeAsyncStop();
-                        recognizeCommands.RecognizeAsync(RecognizeMode.Multiple);
-                        
-                        //recognizeCommands.LoadGrammar(defaultDictationGrammar);
-
-
-
-
-                    }
-
-                    catch
-                    {
-                        return;
-                    }
-
-
-                }
-
-            //}
-
-                else
-                {
-
-                }
-                tbVoiceOutput.AppendText(e.Result.Text.ToString() + System.Environment.NewLine);
-                textBox3.Text = "";
-                for (int i = 0; i < e.Result.Alternates.Count; i++)
-                {
-
-                    textBox3.AppendText(e.Result.Alternates[i].Text + System.Environment.NewLine);
-                }
-                textBox2.BackColor = Color.White;
+                tbConsoleOutput.AppendText(text + System.Environment.NewLine);
+                HighlightPhrase(tbConsoleOutput, text, Color.Green);
             }
+            else
+            {
+                tbConsoleOutput.AppendText(text + System.Environment.NewLine);
+
+                HighlightPhrase(tbConsoleOutput, text, Color.Red);
+            }
+
+
+
         }
-        
 
         void AudioLevelUpdated(object sender, AudioLevelUpdatedEventArgs e)
         {
 
-            verticalVolumeBar.Value = e.AudioLevel;
+            // verticalVolumeBar.Value = e.AudioLevel;
 
         }
 
@@ -319,52 +195,50 @@ namespace HueVoice
                 {
                     switch (command)
                     {
-                        case "lights off":
+                        case "roomy lights off":
                             hueBridge.turnLightsOff("0");
-                            textBox1.AppendText("lights are off" + System.Environment.NewLine);
-                             sSynth.SpeakAsync("turning lights, off");
+                            tbConsoleOutput.AppendText("lights are off" + System.Environment.NewLine);
+                            sSynth.SpeakAsync("turning lights, off");
                             break;
-                        case "lights on":
+                        case "roomy lights on":
                             hueBridge.turnLightsOn("0");
-                            textBox1.AppendText("lights are on" + System.Environment.NewLine);
-                             sSynth.SpeakAsync("turning lights, on");
+                            tbConsoleOutput.AppendText("lights are on" + System.Environment.NewLine);
+                            sSynth.SpeakAsync("turning lights, on");
                             break;
-                        case "red lights":
+                        case "roomy red lights":
                             hueBridge.changeLightColor(Color.FromArgb(255, 0, 0), "0");
                             break;
-                        case "green lights":
+                        case "roomy green lights":
                             hueBridge.changeLightColor(Color.FromArgb(0, 255, 0), "0");
                             break;
-                        case "blue lights":
+                        case "roomy blue lights":
                             hueBridge.changeLightColor(Color.FromArgb(0, 0, 255), "0");
                             break;
-                        case "yellow lights":
+                        case "roomy yellow lights":
                             hueBridge.changeLightColor(Color.FromArgb(255, 255, 0), "0");
                             break;
-                        case "orange lights":
+                        case "roomy orange lights":
                             hueBridge.changeLightColor(Color.FromArgb(255, 128, 0), "0");
                             break;
-                        case "white lights":
+                        case "roomy white lights":
                             hueBridge.changeLightColor(Color.FromArgb(255, 255, 255), "0");
                             break;
-                        case "purple lights":
+                        case "roomy purple lights":
                             hueBridge.changeLightColor(Color.FromArgb(127, 0, 255), "0");
                             break;
                         default:
-                            textBox1.AppendText(e.Result.Text.ToString());
+                            //tbConsoleOutput.AppendText(e.Result.Text.ToString());
                             break;
                     }
-                    if (command.Contains("%"))
+                    if (command.Contains("%") && command.Contains("roomy"))
                     {
                         string[] dimPercentage = command.Split(' ');
-                        hueBridge.dimLights(dimPercentage[2], "0");
+                        hueBridge.setBrightness(dimPercentage[2], "0");
                     }
                 }
-                recognizeCommands.RecognizeAsyncStop();
-                recognizeHotWord.RecognizeAsync(RecognizeMode.Multiple);
 
             }
-            textBox2.BackColor = Color.White;
+
             tbVoiceOutput.AppendText(e.Result.Text.ToString() + System.Environment.NewLine);
             textBox3.Text = "";
             for (int i = 0; i < e.Result.Alternates.Count; i++)
@@ -372,12 +246,13 @@ namespace HueVoice
 
                 textBox3.AppendText(e.Result.Alternates[i].Text + System.Environment.NewLine);
             }
+            micListeningBox.BackColor = Color.DimGray;
 
         }
 
         private void button3_Click(object sender, EventArgs e)
         {
-            recognizeHotWord.RecognizeAsyncStop();
+            recognizeCommands.RecognizeAsyncStop();
             btnHueListen.Enabled = true;
             button3.Enabled = false;
         }
@@ -389,6 +264,34 @@ namespace HueVoice
 
         }
 
+        static void HighlightPhrase(RichTextBox box, string phrase, Color color)
+        {
+            int pos = box.SelectionStart;
+            string s = box.Text;
+            for (int ix = 0; ; )
+            {
+                int jx = s.IndexOf(phrase, ix, StringComparison.CurrentCultureIgnoreCase);
+                if (jx < 0) break;
+                box.SelectionStart = jx;
+                box.SelectionLength = phrase.Length;
+                box.SelectionColor = color;
+                ix = jx + 1;
+            }
+            box.SelectionStart = pos;
+            box.SelectionLength = 0;
+        }
+
+        private void btnColorPicker_Click(object sender, EventArgs e)
+        {
+            hueColorDialog.ShowDialog();
+            hueBridge.changeLightColor(hueColorDialog.Color, "0");
+        }
+
+        void trackBarSaturation_MouseUp(object sender, MouseEventArgs e)
+        {
+            hueBridge.changeSaturation(trackBarSaturation.Value, "0");
+
+        }
 
 
     }

@@ -34,7 +34,6 @@ C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\bin\Release\Q42.HueApi.NET.xml
 C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\bin\Release\System.Net.Http.Extensions.xml
 C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\bin\Release\System.Net.Http.Primitives.xml
 C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\obj\Release\HueVoice.csproj.App.config
-C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\obj\Release\HueVoice.csprojResolveAssemblyReference.cache
 C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\obj\Release\HueVoice.HueForm.resources
 C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\obj\Release\HueVoice.Properties.Resources.resources
 C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\obj\Release\HueVoice.csproj.GenerateResource.Cache
