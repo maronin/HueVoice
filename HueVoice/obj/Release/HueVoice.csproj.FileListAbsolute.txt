@@ -37,3 +37,5 @@ C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\obj\Release\HueVoice.csproj.App
 C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\obj\Release\HueVoice.HueForm.resources
 C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\obj\Release\HueVoice.Properties.Resources.resources
 C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\obj\Release\HueVoice.csproj.GenerateResource.Cache
+C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\obj\Release\HueVoice.csprojResolveAssemblyReference.cache
+C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\obj\Release\HueVoice.HueShutdownForm.resources

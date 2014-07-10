@@ -14,7 +14,13 @@ using System.Speech.AudioFormat;
 using System.Threading;
 using System.Net;
 using Newtonsoft.Json;
-
+using System.Diagnostics;
+using Excel = Microsoft.Office.Interop.Excel;
+using Word = Microsoft.Office.Interop.Word;
+using System.IO;
+using NAudio.Wave;
+using NAudio.CoreAudioApi;
+using NAudio.Wave.SampleProviders;
 namespace HueVoice
 {
     public partial class HueForm : Form
@@ -24,76 +30,96 @@ namespace HueVoice
         PromptBuilder pBuilder = new PromptBuilder();
         SpeechRecognitionEngine recognizeCommands = new SpeechRecognitionEngine();
         HueBridge hueBridge;
-
+        HueShutdownForm shutdownForm;
 
         public HueForm()
         {
-
-            hueBridge = new HueBridge("192.168.1.53", "homepagewebsite", this);
             InitializeComponent();
+            //send over the ip, user id and the current form reference
+            hueBridge = new HueBridge("192.168.1.53", "homepagewebsite", this);
+            
+            this.FormClosed += HueForm_FormClosed;
 
-
-
-            List<HueLight> lights = hueBridge.getAllLights();
+            //Saturation slider
             trackBarSaturation.MouseUp += trackBarSaturation_MouseUp;
-
-
 
             initializeRecognizeCommands();
 
+            //which voice is used
             sSynth.SelectVoice("VW Julie");
-            sSynth.Volume = 100;
+            //how fast the voice talks
             sSynth.Rate = 0;
-            //sSynth.SelectVoice(
 
-            /*
-            SpeechSynthesizer synth = new SpeechSynthesizer();
+
+
+            using (SpeechSynthesizer synth = new SpeechSynthesizer())
+            {
+
+                // Configure the audio output. 
+                synth.SetOutputToWaveFile(@"C:\temp\test.wav", new SpeechAudioFormatInfo(32000, AudioBitsPerSample.Sixteen, AudioChannel.Mono));
+                MemoryStream stream = new MemoryStream();
+                //synth.SetOutputToWaveStream;
+                // Create a SoundPlayer instance to play output audio file.
+                //System.Media.SoundPlayer m_SoundPlayer = new System.Media.SoundPlayer(@"C:\temp\test.wav");
+
+                // Build a prompt.
+                PromptBuilder builder = new PromptBuilder();
+                builder.AppendText("wwwwwwwwwwwwwwwwwwwwwwwwwoooooooooooooooow");
+
+                // Speak the prompt.
+                synth.Speak(builder);
+               // m_SoundPlayer.Play();
+                synth.SetOutputToNull();
+                //ReadWavfiles(@"C:\temp\test2.wav");
+
+
+            }
+
+
+            timer1.Start();
+
+            var player = new WaveOut();
+            var file = new AudioFileReader(@"C:\temp\test.wav");
+            var meter = new MeteringSampleProvider(file);
+            meter.StreamVolume += onPostVolumeMeter;
+            player.DesiredLatency = 70;
+            player.Init(new SampleToWaveProvider(meter));
+
+            player.Play();
+            //player.Dispose();
             
-
-                // Output information about all of the installed voices. 
-                Console.WriteLine("Installed voices -");
-                foreach (InstalledVoice voice in synth.GetInstalledVoices())
-                {
-                    VoiceInfo info = voice.VoiceInfo;
-                    string AudioFormats = "";
-                    foreach (SpeechAudioFormatInfo fmt in info.SupportedAudioFormats)
-                    {
-                        AudioFormats += String.Format("{0}\n",
-                        fmt.EncodingFormat.ToString());
-                    }
-
-                    Console.WriteLine(" Name:          " + info.Name);
-                    Console.WriteLine(" Culture:       " + info.Culture);
-                    Console.WriteLine(" Age:           " + info.Age);
-                    Console.WriteLine(" Gender:        " + info.Gender);
-                    Console.WriteLine(" Description:   " + info.Description);
-                    Console.WriteLine(" ID:            " + info.Id);
-                    Console.WriteLine(" Enabled:       " + voice.Enabled);
-                    if (info.SupportedAudioFormats.Count != 0)
-                    {
-                        Console.WriteLine(" Audio formats: " + AudioFormats);
-                    }
-                    else
-                    {
-                        Console.WriteLine(" No supported audio formats found");
-                    }
-
-                    string AdditionalInfo = "";
-                    foreach (string key in info.AdditionalInfo.Keys)
-                    {
-                        AdditionalInfo += String.Format("  {0}: {1}\n", key, info.AdditionalInfo[key]);
-                    }
-
-                    Console.WriteLine(" Additional Info - " + AdditionalInfo);
-                    Console.WriteLine();
-                }
-            */
 
 
 
         }
 
+        void onPostVolumeMeter(object sender, StreamVolumeEventArgs e)
+        {    
+            
+            int audioLevel = (int)(Math.Log((e.MaxSampleValues[0])) * 75);
+            audioLevel *= -1;
+            if (audioLevel > 255)
+            {
+                audioLevel = 255;
+            }
+            else if (audioLevel < 0)
+            {
+                audioLevel = 0;
+            }
+             
+            computerOutput.BackColor = Color.FromArgb(audioLevel, 0, 0);
+            volumeMeter1.Amplitude = e.MaxSampleValues[0];
+        }
 
+
+        //the application has been closed
+        void HueForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            recognizeCommands.RecognizeAsyncStop();
+
+            Environment.Exit(-1);
+
+        }
 
         public void initializeRecognizeCommands()
         {
@@ -105,14 +131,14 @@ namespace HueVoice
             recognizeCommands.SetInputToDefaultAudioDevice();
             recognizeCommands.SpeechDetected += recognizeCommands_SpeechDetected;
             recognizeCommands.AudioLevelUpdated += AudioLevelUpdated;
-
+            
             Choices sList = new Choices();
 
+            //make light percentage grammer
             for (int i = 1; i <= 100; i++)
             {
                 sList.Add("roomy lights " + i + "%");
             }
-
 
             sList.Add(new string[] 
                 { 
@@ -124,15 +150,53 @@ namespace HueVoice
                     "roomy white lights", 
                     "roomy orange lights",
                     "roomy yellow lights",
-                    "roomy purple lights"
+                    "roomy purple lights",
+                    "computer shutdown",
+                    "computer open excel",
+                    "computer open word",
+                    "computer start TF2",
+                    "computer check mail",
+                    "computer open you tube"
+
                 });
             Grammar gr = new Grammar(new GrammarBuilder(sList));
+
+            //Make grammer for unit conversion
+            Choices conversionCommands = new Choices();
+            conversionCommands.Add("computer convert ");
+
+
+            //SemanticResultKey srkComtype = new SemanticResultKey("conversion command", conversionCommands.ToGrammarBuilder());
+            SemanticResultKey srkActivateConversion = new SemanticResultKey("conversion command", new GrammarBuilder("computer convert "));
+
+            //Unit conversion grammar
+            Choices conversionChoices = new Choices();
+            conversionChoices.Add(" centimeters into inches");
+            conversionChoices.Add(" inches into centimeters");
+            SemanticResultKey srkIntoUnits = new SemanticResultKey("conversion choices", conversionChoices.ToGrammarBuilder());
+
+            GrammarBuilder unitConversionGrammarBuilder = new GrammarBuilder();
+            unitConversionGrammarBuilder.Culture = System.Globalization.CultureInfo.CreateSpecificCulture("en-GB");
+            unitConversionGrammarBuilder.Append(srkActivateConversion);
+            unitConversionGrammarBuilder.AppendDictation();
+            unitConversionGrammarBuilder.Append(srkIntoUnits);
+
+
+            //Google grammar
+            SemanticResultKey srkGoogle = new SemanticResultKey("google", new GrammarBuilder("computer google "));
+
+            GrammarBuilder googleGrammarBuilder = new GrammarBuilder();
+            googleGrammarBuilder.Append(srkGoogle);
+            googleGrammarBuilder.AppendDictation();
+
             try
             {
 
                 recognizeCommands.RequestRecognizerUpdate();
+                recognizeCommands.LoadGrammar(new Grammar(unitConversionGrammarBuilder));
+                recognizeCommands.LoadGrammar(new Grammar(googleGrammarBuilder));
                 recognizeCommands.LoadGrammar(gr);
-                recognizeCommands.LoadGrammar(defaultDictationGrammar);
+                //recognizeCommands.LoadGrammar(defaultDictationGrammar);
 
             }
 
@@ -144,8 +208,29 @@ namespace HueVoice
 
         void recognizeCommands_SpeechDetected(object sender, SpeechDetectedEventArgs e)
         {
-            micListeningBox.BackColor = Color.Red;
+            //micListeningBox.BackColor = Color.Red;
         }
+
+
+        public double convertUnits(double unit, string unitFrom, string unitTo)
+        {
+            double rc = 0;
+
+
+            if (unitTo.Contains("inch") && unitFrom.Contains("centimeter"))
+            {
+                rc = Convert.ToDouble(unit * 0.39370);
+            }
+            else if (unitFrom.Contains("inch") && unitTo.Contains("centimeter"))
+            {
+                rc = Convert.ToDouble(unit / 0.39370);
+            }
+
+           
+            return Math.Round(rc, 2);
+
+        }
+
 
         private void btnHueListen_Click(object sender, EventArgs e)
         {
@@ -175,8 +260,18 @@ namespace HueVoice
 
         void AudioLevelUpdated(object sender, AudioLevelUpdatedEventArgs e)
         {
+            int audioLevel = (int)(Math.Log((e.AudioLevel)) * 75);
 
-            // verticalVolumeBar.Value = e.AudioLevel;
+            if (audioLevel > 255)
+            {
+                audioLevel = 255;
+            }
+            else if (audioLevel < 0)
+            {
+                audioLevel = 0;
+            }
+            micListeningBox.BackColor = Color.FromArgb(audioLevel, 0, 0);
+
 
         }
 
@@ -185,6 +280,11 @@ namespace HueVoice
             if (e.Result.Text == "exit")
             {
                 Application.Exit();
+            }
+
+            else if (e.Result.Text == "computer shutdown")
+            {
+                shutdownPC();
             }
             else
             {
@@ -198,42 +298,104 @@ namespace HueVoice
                         case "roomy lights off":
                             hueBridge.turnLightsOff("0");
                             tbConsoleOutput.AppendText("lights are off" + System.Environment.NewLine);
-                            sSynth.SpeakAsync("turning lights, off");
+                            sSynth.SpeakAsync("turning lights off");
                             break;
                         case "roomy lights on":
                             hueBridge.turnLightsOn("0");
                             tbConsoleOutput.AppendText("lights are on" + System.Environment.NewLine);
-                            sSynth.SpeakAsync("turning lights, on");
+                            sSynth.SpeakAsync("turning lights on");
                             break;
                         case "roomy red lights":
                             hueBridge.changeLightColor(Color.FromArgb(255, 0, 0), "0");
+                            tbConsoleOutput.AppendText("switched to red lights" + System.Environment.NewLine);
+                            sSynth.SpeakAsync("setting red lights");
                             break;
                         case "roomy green lights":
                             hueBridge.changeLightColor(Color.FromArgb(0, 255, 0), "0");
+                            tbConsoleOutput.AppendText("switched to green lights" + System.Environment.NewLine);
+                            sSynth.SpeakAsync("setting green lights");
                             break;
                         case "roomy blue lights":
                             hueBridge.changeLightColor(Color.FromArgb(0, 0, 255), "0");
+                            tbConsoleOutput.AppendText("switched to blue lights" + System.Environment.NewLine);
+                            sSynth.SpeakAsync("setting blue lights");
                             break;
                         case "roomy yellow lights":
                             hueBridge.changeLightColor(Color.FromArgb(255, 255, 0), "0");
+                            tbConsoleOutput.AppendText("switched to yellow lights" + System.Environment.NewLine);
+                            sSynth.SpeakAsync("setting yellow lights");
                             break;
                         case "roomy orange lights":
                             hueBridge.changeLightColor(Color.FromArgb(255, 128, 0), "0");
+                            tbConsoleOutput.AppendText("switched to orange lights" + System.Environment.NewLine);
+                            sSynth.SpeakAsync("setting orange lights");
                             break;
                         case "roomy white lights":
                             hueBridge.changeLightColor(Color.FromArgb(255, 255, 255), "0");
+                            tbConsoleOutput.AppendText("switched to white lights" + System.Environment.NewLine);
+                            sSynth.SpeakAsync("setting white lights");
                             break;
                         case "roomy purple lights":
                             hueBridge.changeLightColor(Color.FromArgb(127, 0, 255), "0");
+                            tbConsoleOutput.AppendText("switched to purple lights" + System.Environment.NewLine);
+                            sSynth.SpeakAsync("setting purple lights");
                             break;
                         default:
                             //tbConsoleOutput.AppendText(e.Result.Text.ToString());
                             break;
+
                     }
+
+                    if (command.Contains("computer"))
+                    {
+                        if (command.Contains("computer google"))
+                        {
+
+                            launchGoogle(command.Replace("computer google ", ""));
+                        }
+
+                        else if (command.Contains("inch") || command.Contains("centimeter"))
+                        {
+                            double parsed = ParseEnglishNumbers(command);
+                            double result = convertUnits(parsed, e.Result.Words[e.Result.Words.Count - 3].Text, e.Result.Words[e.Result.Words.Count - 1].Text);
+                            sSynth.SpeakAsync(parsed + " " + e.Result.Words[e.Result.Words.Count - 3].Text + " is " + result.ToString() + " " + e.Result.Words[e.Result.Words.Count - 1].Text);
+                            string resultOutput = parsed + " " + e.Result.Words[e.Result.Words.Count - 3].Text + " is " + result.ToString() + " " + e.Result.Words[e.Result.Words.Count - 1].Text + System.Environment.NewLine;
+                            tbConsoleOutput.AppendText(resultOutput);
+
+                        }
+                        else if (command == "computer open excel")
+                        {
+                            sSynth.SpeakAsync("Opening Excel");
+                            openExcel();
+                        }
+                        else if (command == "computer open word")
+                        {
+                            sSynth.SpeakAsync("Opening Word");
+                            openWord();
+                        }
+                        else if (command == "computer start tf2")
+                        {
+                            sSynth.SpeakAsync("Opening TF2");
+                            
+                            startTF2();
+                        }
+                        else if (command == "computer open you tube")
+                        {
+                            System.Diagnostics.Process.Start("http://www.youtube.com");
+                        }
+                        else if (command == "computer check mail")
+                        {
+                            System.Diagnostics.Process.Start("http://www.gmail.com");
+                        }
+
+                    }
+
+
                     if (command.Contains("%") && command.Contains("roomy"))
                     {
                         string[] dimPercentage = command.Split(' ');
                         hueBridge.setBrightness(dimPercentage[2], "0");
+                        sSynth.SpeakAsync("setting lights to" + dimPercentage[2].ToString());
                     }
                 }
 
@@ -246,7 +408,7 @@ namespace HueVoice
 
                 textBox3.AppendText(e.Result.Alternates[i].Text + System.Environment.NewLine);
             }
-            micListeningBox.BackColor = Color.DimGray;
+            //micListeningBox.BackColor = Color.DimGray;
 
         }
 
@@ -293,6 +455,243 @@ namespace HueVoice
 
         }
 
+        private void shutdownPC()
+        {
+            shutdownForm = new HueShutdownForm(this, sSynth);
+            recognizeCommands.RecognizeAsyncStop();
+            this.Enabled = false;
+            micListeningBox.BackColor = Color.Gray;
+            shutdownForm.FormClosed += shutdown_FormClosed;
+            shutdownForm.ShowDialog(this);
+
+
+        }
+
+        void shutdown_FormClosed(object sender, FormClosedEventArgs e)
+        {
+
+            this.Enabled = true;
+            micListeningBox.BackColor = Color.Black;
+            recognizeCommands.RecognizeAsync(RecognizeMode.Multiple);
+
+        }
+
+        /*
+        private Grammar CreateUnitGrammer()
+        {
+            // Create a set of color choices.
+            Choices colorChoice = new Choices(new string[] { "red", "green", "blue" });
+
+            // Create grammar builders for the two versions of the phrase.
+            GrammarBuilder makePhrase =
+              GrammarBuilder.Add((GrammarBuilder)"Make background", colorChoice);
+            GrammarBuilder setPhrase =
+              GrammarBuilder.Add("Set background to", (GrammarBuilder)colorChoice);
+
+            // Create a Choices for the two alternative phrases, convert the Choices
+            // to a GrammarBuilder, and construct the grammar from the result.
+            Choices bothChoices = new Choices(new GrammarBuilder[] { makePhrase, setPhrase });
+            GrammarBuilder bothPhrases = new GrammarBuilder(bothChoices);
+
+            Grammar grammar = new Grammar(bothPhrases);
+            grammar.Name = "backgroundColor";
+            return grammar;
+        }
+         */
+
+        /*
+        private Grammar[] CreateSubsetMatchTest()
+        {
+            List<Grammar> grammars = new List<Grammar>(4);
+
+            string phrase = "one two three four five six";
+            foreach (SubsetMatchingMode mode in
+              Enum.GetValues(typeof(SubsetMatchingMode)))
+            {
+                GrammarBuilder gb = new GrammarBuilder();
+                gb.Append(phrase, mode);
+
+                Grammar grammar = new Grammar(gb);
+                grammar.Name = mode.ToString();
+                grammars.Add(grammar);
+            }
+
+            return grammars.ToArray();
+        }
+         */
+
+        public void openExcel()
+        {
+            Excel.Application excelApp = new Excel.Application();
+            excelApp.Visible = true;
+            Excel.Workbook newWorkbook = excelApp.Workbooks.Add();
+        }
+        public void openWord()
+        {
+            Word.Application wordApp = new Word.Application();
+            wordApp.Visible = true;
+            Word.Document newDocument = wordApp.Documents.Add();
+
+        }
+
+        public void startTF2()
+        {
+            Process.Start("steam://rungameid/440");
+        }
+
+        private void launchGoogle(string term)
+        {
+
+            Process.Start("http://google.com/search?q=" + term);
+        }
+
+
+        static double ParseEnglishNumbers(string number)
+        {
+            string[] words = number.ToLower().Split(new char[] { ' ', '-', ',' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] ones = { "one", "two", "three", "four", "five", "six", "seven", "eight", "nine" };
+            string[] teens = { "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen" };
+            string[] tens = { "ten", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety" };
+
+            Dictionary<string, int> modifiers = new Dictionary<string, int>() {
+                {"billion", 1000000000},
+                {"million", 1000000},
+                {"thousand", 1000},
+                {"hundred", 100}
+            };
+
+            if (number == "eleventy billion")
+                return int.MaxValue; // 110,000,000,000 is out of range for an int!
+
+            double result = 0;
+            double currentResult = 0;
+            double lastModifier = 1;
+            double decimalPlace = 0;
+
+            foreach (string word in words)
+            {
+
+                if (modifiers.ContainsKey(word))
+                {
+                    lastModifier *= modifiers[word];
+                }
+                else
+                {
+                    double n;
+
+                    if (lastModifier > 1)
+                    {
+                        result += currentResult * lastModifier;
+                        lastModifier = 1;
+                        currentResult = 0;
+                    }
+
+                    if ((n = Array.IndexOf(ones, word) + 1) > 0)
+                    {
+                        if (decimalPlace > 0)
+                        {
+                            currentResult += (n / decimalPlace);
+                            decimalPlace *= 10;
+                        }
+                        else
+                        {
+                            currentResult += n;
+                        }
+                    }
+                    else if ((n = Array.IndexOf(teens, word) + 1) > 0)
+                    {
+                        if (decimalPlace > 0)
+                        {
+                            currentResult += ((n + 10) / decimalPlace);
+                            decimalPlace *= 10;
+                        }
+                        else
+                        {
+                            currentResult += n + 10;
+                        }
+
+                    }
+                    else if ((n = Array.IndexOf(tens, word) + 1) > 0)
+                    {
+                        if (decimalPlace > 0)
+                        {
+                            currentResult += ((n * 10) / decimalPlace);
+                            decimalPlace *= 10;
+                        }
+                        else
+                        {
+                            currentResult += n * 10;
+                        }
+                    }
+                    else if (word == "point")
+                    {
+                        decimalPlace = 10;
+                    }
+                    else if (word != "and")
+                    {
+                        //throw new ApplicationException("Unrecognized word: " + word);
+                    }
+
+                }
+
+            }
+
+            return result + currentResult * lastModifier;
+        }
+        private void ReadWavfiles(string fileName)
+        {
+            byte[] fa = File.ReadAllBytes(fileName);
+
+            int startByte = 0;
+
+            // look for data header
+            {
+                var x = 0;
+                while (x < fa.Length)
+                {
+                    if (fa[x] == 'd' && fa[x + 1] == 'a' &&
+                        fa[x + 2] == 't' && fa[x + 3] == 'a')
+                    {
+                        startByte = x + 8;
+                        break;
+                    }
+                    x++;
+                }
+            }
+
+            // Split out channels from sample
+            var sLeft = new short[fa.Length / 4];
+            var sRight = new short[fa.Length / 4];
+
+            {
+                var x = 0;
+                var length = fa.Length;
+                for (int s = startByte; s < length; s = s + 4)
+                {
+                    sLeft[x] = (short)(fa[s + 1] * 0x100 + fa[s]);
+                    sRight[x] = (short)(fa[s + 3] * 0x100 + fa[s + 2]);
+                    if (sRight[x] < 0)
+                        sRight[x] = 0;
+                    else if (sRight[x] > 255)
+                        sRight[x] = 255;
+                    micListeningBox.BackColor = Color.FromArgb(sRight[x], 0, 0);
+                    x++;
+                }
+            }
+            
+            // do somthing with the wav data in sLeft and sRight
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            MMDeviceEnumerator de = new MMDeviceEnumerator();
+            MMDevice device = de.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
+            float volume = (float)device.AudioMeterInformation.MasterPeakValue * 100;
+            progressBar1.Value = (int)volume;
+        }
+
+
 
     }
+
 }

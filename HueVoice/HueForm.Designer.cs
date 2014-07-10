@@ -28,20 +28,25 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(HueForm));
             this.btnHueListen = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
             this.btnToggleLights = new System.Windows.Forms.Button();
             this.tbVoiceOutput = new System.Windows.Forms.TextBox();
-            this.micListeningBox = new System.Windows.Forms.TextBox();
             this.textBox3 = new System.Windows.Forms.TextBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.tbConsoleOutput = new System.Windows.Forms.RichTextBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.hueColorDialog = new System.Windows.Forms.ColorDialog();
-            this.btnColorPicker = new System.Windows.Forms.Button();
-            this.trackBarSaturation = new System.Windows.Forms.TrackBar();
             this.label1 = new System.Windows.Forms.Label();
+            this.trackBarSaturation = new System.Windows.Forms.TrackBar();
+            this.btnColorPicker = new System.Windows.Forms.Button();
+            this.hueColorDialog = new System.Windows.Forms.ColorDialog();
+            this.progressBar1 = new System.Windows.Forms.ProgressBar();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.volumeMeter1 = new NAudio.Gui.VolumeMeter();
+            this.computerOutput = new HueVoice.RoundButton();
+            this.micListeningBox = new HueVoice.RoundButton();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarSaturation)).BeginInit();
@@ -85,36 +90,26 @@
             this.tbVoiceOutput.Size = new System.Drawing.Size(273, 70);
             this.tbVoiceOutput.TabIndex = 7;
             // 
-            // micListeningBox
-            // 
-            this.micListeningBox.BackColor = System.Drawing.Color.DimGray;
-            this.micListeningBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.micListeningBox.Location = new System.Drawing.Point(25, 41);
-            this.micListeningBox.Multiline = true;
-            this.micListeningBox.Name = "micListeningBox";
-            this.micListeningBox.Size = new System.Drawing.Size(31, 30);
-            this.micListeningBox.TabIndex = 8;
-            // 
             // textBox3
             // 
-            this.textBox3.Location = new System.Drawing.Point(738, 12);
+            this.textBox3.Location = new System.Drawing.Point(693, 12);
             this.textBox3.Multiline = true;
             this.textBox3.Name = "textBox3";
-            this.textBox3.Size = new System.Drawing.Size(101, 459);
+            this.textBox3.Size = new System.Drawing.Size(146, 459);
             this.textBox3.TabIndex = 9;
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.btnHueListen);
             this.groupBox1.Controls.Add(this.micListeningBox);
+            this.groupBox1.Controls.Add(this.btnHueListen);
             this.groupBox1.Controls.Add(this.button3);
             this.groupBox1.Controls.Add(this.btnToggleLights);
-            this.groupBox1.Location = new System.Drawing.Point(389, 384);
+            this.groupBox1.Location = new System.Drawing.Point(414, 384);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(273, 90);
             this.groupBox1.TabIndex = 10;
             this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "groupBox1";
+            this.groupBox1.Text = "Controls";
             // 
             // tbConsoleOutput
             // 
@@ -140,15 +135,14 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Light Color";
             // 
-            // btnColorPicker
+            // label1
             // 
-            this.btnColorPicker.Location = new System.Drawing.Point(6, 19);
-            this.btnColorPicker.Name = "btnColorPicker";
-            this.btnColorPicker.Size = new System.Drawing.Size(75, 23);
-            this.btnColorPicker.TabIndex = 14;
-            this.btnColorPicker.Text = "Pick Color";
-            this.btnColorPicker.UseVisualStyleBackColor = true;
-            this.btnColorPicker.Click += new System.EventHandler(this.btnColorPicker_Click);
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(60, 60);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(55, 13);
+            this.label1.TabIndex = 15;
+            this.label1.Text = "Saturation";
             // 
             // trackBarSaturation
             // 
@@ -159,20 +153,66 @@
             this.trackBarSaturation.TabIndex = 14;
             this.trackBarSaturation.TickFrequency = 10;
             // 
-            // label1
+            // btnColorPicker
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(60, 60);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(55, 13);
-            this.label1.TabIndex = 15;
-            this.label1.Text = "Saturation";
+            this.btnColorPicker.Location = new System.Drawing.Point(6, 19);
+            this.btnColorPicker.Name = "btnColorPicker";
+            this.btnColorPicker.Size = new System.Drawing.Size(75, 23);
+            this.btnColorPicker.TabIndex = 14;
+            this.btnColorPicker.Text = "Pick Color";
+            this.btnColorPicker.UseVisualStyleBackColor = true;
+            this.btnColorPicker.Click += new System.EventHandler(this.btnColorPicker_Click);
+            // 
+            // progressBar1
+            // 
+            this.progressBar1.Location = new System.Drawing.Point(907, 354);
+            this.progressBar1.Name = "progressBar1";
+            this.progressBar1.Size = new System.Drawing.Size(210, 71);
+            this.progressBar1.TabIndex = 15;
+            // 
+            // timer1
+            // 
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
+            // volumeMeter1
+            // 
+            this.volumeMeter1.Amplitude = 0F;
+            this.volumeMeter1.Location = new System.Drawing.Point(1074, 193);
+            this.volumeMeter1.MaxDb = 18F;
+            this.volumeMeter1.MinDb = -60F;
+            this.volumeMeter1.Name = "volumeMeter1";
+            this.volumeMeter1.Size = new System.Drawing.Size(43, 145);
+            this.volumeMeter1.TabIndex = 16;
+            this.volumeMeter1.Text = "volumeMeter1";
+            // 
+            // computerOutput
+            // 
+            this.computerOutput.BackColor = System.Drawing.Color.DimGray;
+            this.computerOutput.Enabled = false;
+            this.computerOutput.Location = new System.Drawing.Point(926, 12);
+            this.computerOutput.Name = "computerOutput";
+            this.computerOutput.Size = new System.Drawing.Size(147, 145);
+            this.computerOutput.TabIndex = 15;
+            this.computerOutput.UseVisualStyleBackColor = false;
+            // 
+            // micListeningBox
+            // 
+            this.micListeningBox.BackColor = System.Drawing.Color.DimGray;
+            this.micListeningBox.Enabled = false;
+            this.micListeningBox.Location = new System.Drawing.Point(15, 22);
+            this.micListeningBox.Name = "micListeningBox";
+            this.micListeningBox.Size = new System.Drawing.Size(57, 57);
+            this.micListeningBox.TabIndex = 14;
+            this.micListeningBox.UseVisualStyleBackColor = false;
             // 
             // HueForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(851, 483);
+            this.ClientSize = new System.Drawing.Size(1161, 556);
+            this.Controls.Add(this.volumeMeter1);
+            this.Controls.Add(this.computerOutput);
+            this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.tbConsoleOutput);
             this.Controls.Add(this.groupBox1);
@@ -182,7 +222,6 @@
             this.Name = "HueForm";
             this.Text = "Hue Voice";
             this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarSaturation)).EndInit();
@@ -195,7 +234,6 @@
 
         private System.Windows.Forms.Button btnHueListen;
         private System.Windows.Forms.Button button3;
-        private System.Windows.Forms.TextBox micListeningBox;
         private System.Windows.Forms.Button btnToggleLights;
         private System.Windows.Forms.TextBox tbVoiceOutput;
         private System.Windows.Forms.TextBox textBox3;
@@ -206,6 +244,11 @@
         private System.Windows.Forms.Button btnColorPicker;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TrackBar trackBarSaturation;
+        private RoundButton micListeningBox;
+        private System.Windows.Forms.ProgressBar progressBar1;
+        private System.Windows.Forms.Timer timer1;
+        private RoundButton computerOutput;
+        private NAudio.Gui.VolumeMeter volumeMeter1;
         
     }
 }
