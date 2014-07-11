@@ -28,13 +28,11 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(HueForm));
             this.btnHueListen = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
             this.btnToggleLights = new System.Windows.Forms.Button();
             this.tbVoiceOutput = new System.Windows.Forms.TextBox();
-            this.textBox3 = new System.Windows.Forms.TextBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.tbConsoleOutput = new System.Windows.Forms.RichTextBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
@@ -42,10 +40,6 @@
             this.trackBarSaturation = new System.Windows.Forms.TrackBar();
             this.btnColorPicker = new System.Windows.Forms.Button();
             this.hueColorDialog = new System.Windows.Forms.ColorDialog();
-            this.progressBar1 = new System.Windows.Forms.ProgressBar();
-            this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.volumeMeter1 = new NAudio.Gui.VolumeMeter();
-            this.computerOutput = new HueVoice.RoundButton();
             this.micListeningBox = new HueVoice.RoundButton();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -84,19 +78,11 @@
             // 
             // tbVoiceOutput
             // 
-            this.tbVoiceOutput.Location = new System.Drawing.Point(414, 308);
+            this.tbVoiceOutput.Location = new System.Drawing.Point(399, 384);
             this.tbVoiceOutput.Multiline = true;
             this.tbVoiceOutput.Name = "tbVoiceOutput";
             this.tbVoiceOutput.Size = new System.Drawing.Size(273, 70);
             this.tbVoiceOutput.TabIndex = 7;
-            // 
-            // textBox3
-            // 
-            this.textBox3.Location = new System.Drawing.Point(693, 12);
-            this.textBox3.Multiline = true;
-            this.textBox3.Name = "textBox3";
-            this.textBox3.Size = new System.Drawing.Size(146, 459);
-            this.textBox3.TabIndex = 9;
             // 
             // groupBox1
             // 
@@ -104,7 +90,7 @@
             this.groupBox1.Controls.Add(this.btnHueListen);
             this.groupBox1.Controls.Add(this.button3);
             this.groupBox1.Controls.Add(this.btnToggleLights);
-            this.groupBox1.Location = new System.Drawing.Point(414, 384);
+            this.groupBox1.Location = new System.Drawing.Point(399, 460);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(273, 90);
             this.groupBox1.TabIndex = 10;
@@ -116,10 +102,10 @@
             this.tbConsoleOutput.BackColor = System.Drawing.Color.Black;
             this.tbConsoleOutput.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.tbConsoleOutput.ForeColor = System.Drawing.Color.White;
-            this.tbConsoleOutput.Location = new System.Drawing.Point(12, 12);
+            this.tbConsoleOutput.Location = new System.Drawing.Point(7, 384);
             this.tbConsoleOutput.Name = "tbConsoleOutput";
             this.tbConsoleOutput.ReadOnly = true;
-            this.tbConsoleOutput.Size = new System.Drawing.Size(675, 290);
+            this.tbConsoleOutput.Size = new System.Drawing.Size(180, 166);
             this.tbConsoleOutput.TabIndex = 11;
             this.tbConsoleOutput.Text = "";
             // 
@@ -128,7 +114,7 @@
             this.groupBox2.Controls.Add(this.label1);
             this.groupBox2.Controls.Add(this.trackBarSaturation);
             this.groupBox2.Controls.Add(this.btnColorPicker);
-            this.groupBox2.Location = new System.Drawing.Point(12, 308);
+            this.groupBox2.Location = new System.Drawing.Point(193, 384);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(200, 166);
             this.groupBox2.TabIndex = 13;
@@ -163,38 +149,6 @@
             this.btnColorPicker.UseVisualStyleBackColor = true;
             this.btnColorPicker.Click += new System.EventHandler(this.btnColorPicker_Click);
             // 
-            // progressBar1
-            // 
-            this.progressBar1.Location = new System.Drawing.Point(907, 354);
-            this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(210, 71);
-            this.progressBar1.TabIndex = 15;
-            // 
-            // timer1
-            // 
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
-            // 
-            // volumeMeter1
-            // 
-            this.volumeMeter1.Amplitude = 0F;
-            this.volumeMeter1.Location = new System.Drawing.Point(1074, 193);
-            this.volumeMeter1.MaxDb = 18F;
-            this.volumeMeter1.MinDb = -60F;
-            this.volumeMeter1.Name = "volumeMeter1";
-            this.volumeMeter1.Size = new System.Drawing.Size(43, 145);
-            this.volumeMeter1.TabIndex = 16;
-            this.volumeMeter1.Text = "volumeMeter1";
-            // 
-            // computerOutput
-            // 
-            this.computerOutput.BackColor = System.Drawing.Color.DimGray;
-            this.computerOutput.Enabled = false;
-            this.computerOutput.Location = new System.Drawing.Point(926, 12);
-            this.computerOutput.Name = "computerOutput";
-            this.computerOutput.Size = new System.Drawing.Size(147, 145);
-            this.computerOutput.TabIndex = 15;
-            this.computerOutput.UseVisualStyleBackColor = false;
-            // 
             // micListeningBox
             // 
             this.micListeningBox.BackColor = System.Drawing.Color.DimGray;
@@ -209,14 +163,10 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1161, 556);
-            this.Controls.Add(this.volumeMeter1);
-            this.Controls.Add(this.computerOutput);
-            this.Controls.Add(this.progressBar1);
+            this.ClientSize = new System.Drawing.Size(698, 556);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.tbConsoleOutput);
             this.Controls.Add(this.groupBox1);
-            this.Controls.Add(this.textBox3);
             this.Controls.Add(this.tbVoiceOutput);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "HueForm";
@@ -236,7 +186,6 @@
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.Button btnToggleLights;
         private System.Windows.Forms.TextBox tbVoiceOutput;
-        private System.Windows.Forms.TextBox textBox3;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.RichTextBox tbConsoleOutput;
         private System.Windows.Forms.GroupBox groupBox2;
@@ -245,10 +194,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TrackBar trackBarSaturation;
         private RoundButton micListeningBox;
-        private System.Windows.Forms.ProgressBar progressBar1;
-        private System.Windows.Forms.Timer timer1;
-        private RoundButton computerOutput;
-        private NAudio.Gui.VolumeMeter volumeMeter1;
         
     }
 }

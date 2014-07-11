@@ -39,3 +39,6 @@ C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\obj\Release\HueVoice.Properties
 C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\obj\Release\HueVoice.csproj.GenerateResource.Cache
 C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\obj\Release\HueVoice.csprojResolveAssemblyReference.cache
 C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\obj\Release\HueVoice.HueShutdownForm.resources
+C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\obj\Release\HueVoice.csproj.ResolveComReference.cache
+C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\bin\Release\NAudio.dll
+C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\bin\Release\NAudio.xml

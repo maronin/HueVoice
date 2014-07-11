@@ -18,27 +18,7 @@ C:\Users\Mark\Documents\Visual Studio 2012\Projects\HueVoice\HueVoice\bin\Debug\
 C:\Users\Mark\Documents\Visual Studio 2012\Projects\HueVoice\HueVoice\bin\Debug\Q42.HueApi.xml
 C:\Users\Mark\Documents\Visual Studio 2012\Projects\HueVoice\HueVoice\bin\Debug\System.Net.Http.Extensions.xml
 C:\Users\Mark\Documents\Visual Studio 2012\Projects\HueVoice\HueVoice\bin\Debug\System.Net.Http.Primitives.xml
-C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\bin\Debug\HueVoice.exe.config
-C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\obj\Debug\HueVoice.exe
-C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\obj\Debug\HueVoice.pdb
 C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\bin\Debug\HueVoice.exe
-C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\bin\Debug\HueVoice.pdb
-C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\bin\Debug\Newtonsoft.Json.dll
-C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\bin\Debug\Q42.HueApi.dll
-C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\bin\Debug\Q42.HueApi.NET.dll
-C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\bin\Debug\System.Net.Http.Extensions.dll
-C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\bin\Debug\System.Net.Http.Primitives.dll
-C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\bin\Debug\Newtonsoft.Json.xml
-C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\bin\Debug\Q42.HueApi.xml
-C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\bin\Debug\Q42.HueApi.NET.xml
-C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\bin\Debug\System.Net.Http.Extensions.xml
-C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\bin\Debug\System.Net.Http.Primitives.xml
-C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\obj\Debug\HueVoice.csproj.App.config
-C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\obj\Debug\HueVoice.Properties.Resources.resources
-C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\obj\Debug\HueVoice.csproj.GenerateResource.Cache
-C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\obj\Debug\HueVoice.HueForm.resources
-C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\obj\Debug\HueVoice.HueShutdownForm.resources
-C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\obj\Debug\HueVoice.csproj.ResolveComReference.cache
 C:\Users\Mark\Documents\GitHub\Hue Voice\HueVoice\bin\Debug\HueVoice.exe.config
 C:\Users\Mark\Documents\GitHub\Hue Voice\HueVoice\obj\Debug\HueVoice.csproj.App.config
 C:\Users\Mark\Documents\GitHub\Hue Voice\HueVoice\obj\Debug\HueVoice.csproj.ResolveComReference.cache
@@ -61,6 +41,26 @@ C:\Users\Mark\Documents\GitHub\Hue Voice\HueVoice\obj\Debug\HueVoice.HueForm.res
 C:\Users\Mark\Documents\GitHub\Hue Voice\HueVoice\obj\Debug\HueVoice.HueShutdownForm.resources
 C:\Users\Mark\Documents\GitHub\Hue Voice\HueVoice\obj\Debug\HueVoice.Properties.Resources.resources
 C:\Users\Mark\Documents\GitHub\Hue Voice\HueVoice\obj\Debug\HueVoice.csproj.GenerateResource.Cache
-C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\obj\Debug\HueVoice.csprojResolveAssemblyReference.cache
 C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\bin\Debug\NAudio.dll
+C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\bin\Debug\HueVoice.exe.config
+C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\obj\Debug\HueVoice.csproj.App.config
+C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\obj\Debug\HueVoice.csproj.ResolveComReference.cache
+C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\obj\Debug\HueVoice.exe
+C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\obj\Debug\HueVoice.pdb
+C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\bin\Debug\HueVoice.pdb
+C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\bin\Debug\Q42.HueApi.dll
+C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\bin\Debug\Q42.HueApi.NET.dll
+C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\bin\Debug\System.Net.Http.Extensions.dll
+C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\bin\Debug\System.Net.Http.Primitives.dll
 C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\bin\Debug\NAudio.xml
+C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\bin\Debug\Newtonsoft.Json.xml
+C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\bin\Debug\Q42.HueApi.xml
+C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\bin\Debug\Q42.HueApi.NET.xml
+C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\bin\Debug\System.Net.Http.Extensions.xml
+C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\bin\Debug\System.Net.Http.Primitives.xml
+C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\obj\Debug\HueVoice.csprojResolveAssemblyReference.cache
+C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\obj\Debug\HueVoice.HueForm.resources
+C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\obj\Debug\HueVoice.HueShutdownForm.resources
+C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\obj\Debug\HueVoice.Properties.Resources.resources
+C:\Users\Mark\Documents\GitHub\HueVoice\HueVoice\obj\Debug\HueVoice.csproj.GenerateResource.Cache
