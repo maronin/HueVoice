@@ -38,11 +38,26 @@ namespace HueVoice
             InitializeComponent();
             //send over the ip, user id and the current form reference
             hueBridge = new HueBridge("192.168.1.53", "homepagewebsite", this);
-
-            drawSynthVolumeUI();
-
             this.FormClosed += HueForm_FormClosed;
 
+            // Configure the audio output. 
+            sSynth.SetOutputToWaveFile(@"C:\temp\test.wav", new SpeechAudioFormatInfo(32000, AudioBitsPerSample.Sixteen, AudioChannel.Mono));
+            MemoryStream stream = new MemoryStream();
+
+
+            // Build a prompt.
+            PromptBuilder builder = new PromptBuilder();
+            builder.AppendText("helloooooooooooo");
+
+            // Speak the prompt.
+            sSynth.Speak(builder);
+
+            sSynth.SetOutputToNull();
+            sSynth.SetOutputToDefaultAudioDevice();
+
+            playSound(0);
+            playSound(1);
+            playSound(2);
 
 
             //Saturation slider
@@ -52,52 +67,15 @@ namespace HueVoice
 
             //which voice is used
             sSynth.SelectVoice("VW Julie");
-            //how fast the voice talks
-            sSynth.Rate = 0;
-
             
 
+            System.Speech.AudioFormat.SpeechAudioFormatInfo synthFormat = new System.Speech.AudioFormat.SpeechAudioFormatInfo(32000, AudioBitsPerSample.Sixteen, AudioChannel.Mono);
 
 
 
 
-        }
-
-        void player_PlaybackStopped(object sender, StoppedEventArgs e)
-        {
-            for (int i = 1; i <= 25; i++)
-            {
-                RoundButton roundButton = (RoundButton)Controls["synthVolume" + i];
-                roundButton.BackColor = Color.FromArgb(0, 0, 0);
-            }
-            wavFile.Close();
-        }
-
-        void onPostVolumeMeter(object sender, StreamVolumeEventArgs e)
-        {
-            double audioLevel = e.MaxSampleValues[0];
-
-            audioLevel *= 400;
-
-            for (int i = 1; i <= 25; i++)
-            {
-                
-                RoundButton roundButton = (RoundButton)Controls["synthVolume" + i];
-               // audioLevel -= i;
-                audioLevel = (audioLevel - i);
-
-                if (audioLevel > 255)
-                {
-                    audioLevel = 255;
-                }
-                else if (audioLevel < 0)
-                {
-                    audioLevel = 0;
-                }
-                
-                roundButton.BackColor = Color.FromArgb((int)audioLevel, 0, 0);
-
-            }
+            //how fast the voice talks
+            sSynth.Rate = 0;
 
         }
 
@@ -288,47 +266,47 @@ namespace HueVoice
                         case "roomy lights off":
                             hueBridge.turnLightsOff("0");
                             tbConsoleOutput.AppendText("lights are off" + System.Environment.NewLine);
-                            speak("turning lights off");
+                            sSynth.SpeakAsync("turning lights off");
                             break;
                         case "roomy lights on":
                             hueBridge.turnLightsOn("0");
                             tbConsoleOutput.AppendText("lights are on" + System.Environment.NewLine);
-                            speak("turning lights on");
+                            sSynth.SpeakAsync("turning lights on");
                             break;
                         case "roomy red lights":
                             hueBridge.changeLightColor(Color.FromArgb(255, 0, 0), "0");
                             tbConsoleOutput.AppendText("switched to red lights" + System.Environment.NewLine);
-                            speak("setting red lights");
+                            sSynth.SpeakAsync("setting red lights");
                             break;
                         case "roomy green lights":
                             hueBridge.changeLightColor(Color.FromArgb(0, 255, 0), "0");
                             tbConsoleOutput.AppendText("switched to green lights" + System.Environment.NewLine);
-                            speak("setting green lights");
+                            sSynth.SpeakAsync("setting green lights");
                             break;
                         case "roomy blue lights":
                             hueBridge.changeLightColor(Color.FromArgb(0, 0, 255), "0");
                             tbConsoleOutput.AppendText("switched to blue lights" + System.Environment.NewLine);
-                            speak("setting blue lights");
+                            sSynth.SpeakAsync("setting blue lights");
                             break;
                         case "roomy yellow lights":
                             hueBridge.changeLightColor(Color.FromArgb(255, 255, 0), "0");
                             tbConsoleOutput.AppendText("switched to yellow lights" + System.Environment.NewLine);
-                            speak("setting yellow lights");
+                            sSynth.SpeakAsync("setting yellow lights");
                             break;
                         case "roomy orange lights":
                             hueBridge.changeLightColor(Color.FromArgb(255, 128, 0), "0");
                             tbConsoleOutput.AppendText("switched to orange lights" + System.Environment.NewLine);
-                            speak("setting orange lights");
+                            sSynth.SpeakAsync("setting orange lights");
                             break;
                         case "roomy white lights":
                             hueBridge.changeLightColor(Color.FromArgb(255, 255, 255), "0");
                             tbConsoleOutput.AppendText("switched to white lights" + System.Environment.NewLine);
-                            speak("setting white lights");
+                            sSynth.SpeakAsync("setting white lights");
                             break;
                         case "roomy purple lights":
                             hueBridge.changeLightColor(Color.FromArgb(127, 0, 255), "0");
                             tbConsoleOutput.AppendText("switched to purple lights" + System.Environment.NewLine);
-                            speak("setting purple lights");
+                            sSynth.SpeakAsync("setting purple lights");
                             break;
                         default:
                             //tbConsoleOutput.AppendText(e.Result.Text.ToString());
@@ -348,24 +326,24 @@ namespace HueVoice
                         {
                             double parsed = ParseEnglishNumbers(command);
                             double result = convertUnits(parsed, e.Result.Words[e.Result.Words.Count - 3].Text, e.Result.Words[e.Result.Words.Count - 1].Text);
-                            speak(parsed + " " + e.Result.Words[e.Result.Words.Count - 3].Text + " is " + result.ToString() + " " + e.Result.Words[e.Result.Words.Count - 1].Text);
+                            sSynth.SpeakAsync(parsed + " " + e.Result.Words[e.Result.Words.Count - 3].Text + " is " + result.ToString() + " " + e.Result.Words[e.Result.Words.Count - 1].Text);
                             string resultOutput = parsed + " " + e.Result.Words[e.Result.Words.Count - 3].Text + " is " + result.ToString() + " " + e.Result.Words[e.Result.Words.Count - 1].Text + System.Environment.NewLine;
                             tbConsoleOutput.AppendText(resultOutput);
 
                         }
                         else if (command == "computer open excel")
                         {
-                            speak("Opening Excel");
+                            sSynth.SpeakAsync("Opening Excel");
                             openExcel();
                         }
                         else if (command == "computer open word")
                         {
-                            speak("Opening Word");
+                            sSynth.SpeakAsync("Opening Word");
                             openWord();
                         }
                         else if (command == "computer start tf2")
                         {
-                            speak("Opening TF2");
+                            sSynth.SpeakAsync("Opening TF2");
 
                             startTF2();
                         }
@@ -385,7 +363,7 @@ namespace HueVoice
                     {
                         string[] dimPercentage = command.Split(' ');
                         hueBridge.setBrightness(dimPercentage[2], "0");
-                       speak("setting lights to" + dimPercentage[2].ToString());
+                        sSynth.SpeakAsync("setting lights to" + dimPercentage[2].ToString());
                     }
                 }
 
@@ -468,49 +446,6 @@ namespace HueVoice
 
         }
 
-        /*
-        private Grammar CreateUnitGrammer()
-        {
-            // Create a set of color choices.
-            Choices colorChoice = new Choices(new string[] { "red", "green", "blue" });
-
-            // Create grammar builders for the two versions of the phrase.
-            GrammarBuilder makePhrase =
-              GrammarBuilder.Add((GrammarBuilder)"Make background", colorChoice);
-            GrammarBuilder setPhrase =
-              GrammarBuilder.Add("Set background to", (GrammarBuilder)colorChoice);
-
-            // Create a Choices for the two alternative phrases, convert the Choices
-            // to a GrammarBuilder, and construct the grammar from the result.
-            Choices bothChoices = new Choices(new GrammarBuilder[] { makePhrase, setPhrase });
-            GrammarBuilder bothPhrases = new GrammarBuilder(bothChoices);
-
-            Grammar grammar = new Grammar(bothPhrases);
-            grammar.Name = "backgroundColor";
-            return grammar;
-        }
-         */
-
-        /*
-        private Grammar[] CreateSubsetMatchTest()
-        {
-            List<Grammar> grammars = new List<Grammar>(4);
-
-            string phrase = "one two three four five six";
-            foreach (SubsetMatchingMode mode in
-              Enum.GetValues(typeof(SubsetMatchingMode)))
-            {
-                GrammarBuilder gb = new GrammarBuilder();
-                gb.Append(phrase, mode);
-
-                Grammar grammar = new Grammar(gb);
-                grammar.Name = mode.ToString();
-                grammars.Add(grammar);
-            }
-
-            return grammars.ToArray();
-        }
-         */
 
         public void openExcel()
         {
@@ -631,73 +566,36 @@ namespace HueVoice
             return result + currentResult * lastModifier;
         }
 
-        private void drawSynthVolumeUI()
+        public void playSound(int deviceNumber)
         {
-            var cntrls = new List<RoundButton>();
-            int spaceBetweenLayers = 5;
-            int x = 200, y = 200;
+           
+            WaveFileReader waveReader = new NAudio.Wave.WaveFileReader(@"C:\temp\test.wav");
 
-
-            for (int i = 1; i <= 25; i++)
-            {
-                int circleRadius = (spaceBetweenLayers + i) * 10;
-
-                this.Controls.Add(new RoundButton()
-                {
-                    Name = "synthVolume" + i,
-                    BackColor = Color.Black,
-                    Location = new System.Drawing.Point(x - circleRadius / 2, y - circleRadius / 2),
-                    Size = new System.Drawing.Size(circleRadius, circleRadius),
-                    Enabled = false
-
-                });
-
-
-
-            }
-
-
-        }
-        //getting volume for current default device
-        /*
-        private void timer1_Tick(object sender, EventArgs e)
-        {
-            MMDeviceEnumerator de = new MMDeviceEnumerator();
-            MMDevice device = de.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
-            float volume = (float)device.AudioMeterInformation.MasterPeakValue * 100;
-            progressBar1.Value = (int)volume;
-        }
-        */
-
-        private void speak(string phrase)
-        {
-            // Configure the audio output. 
-            sSynth.SetOutputToWaveFile(@"C:\temp\test.wav", new SpeechAudioFormatInfo(32000, AudioBitsPerSample.Sixteen, AudioChannel.Mono));
-            MemoryStream stream = new MemoryStream();
-
-
-            // Build a prompt.
-            PromptBuilder builder = new PromptBuilder();
-            builder.AppendText(phrase);
-
-            // Speak the prompt.
-            sSynth.Speak(builder);
-
-            sSynth.SetOutputToNull();
-            sSynth.SetOutputToDefaultAudioDevice();
-
-
+            var waveOut = new NAudio.Wave.WaveOut();
+            waveOut.DeviceNumber = deviceNumber;
+            
             player = new WaveOut();
-            wavFile = new AudioFileReader(@"C:\temp\test.wav");
-            var meter = new MeteringSampleProvider(wavFile);
-            meter.StreamVolume += onPostVolumeMeter;
             player.DesiredLatency = 70;
-            player.Init(new SampleToWaveProvider(meter));
-            player.PlaybackStopped += player_PlaybackStopped;
+
+            player = waveOut;
+            player.Init(waveReader);
+            player.PlaybackStopped +=player_PlaybackStopped;
+            sSynth.SetOutputToNull();
             player.Play();
+            
             
         }
 
+        private void player_PlaybackStopped(object sender, StoppedEventArgs e)
+        {
+            if(wavFile !=null)
+                wavFile.Close();
+        }
+
+
+
     }
+
+
 
 }
